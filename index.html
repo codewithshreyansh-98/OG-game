@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#ff671f">
+  <meta name="description" content="OGRun — The Great Indian 3D Endless Runner featuring iconic monuments, comedic caricatures, and dynamic gameplay.">
+  <title>OGRun — The Great Indian Run</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Outfit:wght@400;600;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="ui-screen active">
+    <div class="loader-content">
+      <div class="om-symbol">ॐ</div>
+      <h1 class="game-logo-text">OG<span>RUN</span></h1>
+      <p class="tagline">THE GREAT INDIAN RUN</p>
+      
+      <div class="progress-bar-container">
+        <div id="progress-bar" class="progress-bar-fill"></div>
+      </div>
+      <p id="loading-status" class="loading-status">Preparing Taj Mahal Gardens...</p>
+    </div>
+  </div>
+
+  <!-- Main Menu Screen -->
+  <div id="main-menu" class="ui-screen">
+    <div class="menu-header">
+      <div class="brand-badge">
+        <span class="chakra-icon">☸</span>
+        <span class="brand-sub">AN EPIC 3D ADVENTURE</span>
+        <span class="chakra-icon">☸</span>
+      </div>
+      <h1 class="menu-title">OG<span>RUN</span></h1>
+      <div class="menu-tagline">THE GREAT INDIAN RUN</div>
+    </div>
+
+    <div class="menu-stats-pill">
+      <div class="stat-item">
+        <span class="stat-label">BEST SCORE</span>
+        <span id="menu-high-score" class="stat-value">0</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">TOTAL COINS</span>
+        <span id="menu-total-coins" class="stat-value">₹0</span>
+      </div>
+    </div>
+
+    <div class="menu-actions">
+      <button id="btn-play" class="btn btn-primary btn-large glow-effect">
+        <span class="btn-icon">▶</span> RUN NOW
+      </button>
+      
+      <div class="menu-btn-row">
+        <button id="btn-characters" class="btn btn-secondary">
+          <span class="btn-icon">🥋</span> OUTFITS
+        </button>
+        <button id="btn-how-to-play" class="btn btn-secondary">
+          <span class="btn-icon">❓</span> HOW TO PLAY
+        </button>
+      </div>
+
+      <div class="menu-btn-row">
+        <button id="btn-sound-toggle" class="btn btn-icon-only" title="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button id="btn-settings" class="btn btn-secondary">
+          <span class="btn-icon">⚙️</span> SETTINGS
+        </button>
+      </div>
+    </div>
+
+    <div class="menu-footer">
+      <p>© 2026 OGRun • Satirical Casual 3D Runner • India Edition</p>
+    </div>
+  </div>
+
+  <!-- Gameplay HUD Screen -->
+  <div id="game-hud" class="ui-screen">
+    <div class="hud-top">
+      <div class="hud-stat-card score-card">
+        <span class="hud-label">SCORE</span>
+        <span id="hud-score" class="hud-value">0</span>
+        <span id="hud-multiplier" class="hud-sub-badge">x1</span>
+      </div>
+
+      <div class="hud-center-cluster">
+        <div id="hud-zone-pill" class="zone-pill">
+          <span class="zone-icon">📍</span>
+          <span id="hud-zone-name">TAJ MAHAL</span>
+        </div>
+        <div id="hud-speed-meter" class="speed-pill">
+          <span id="hud-speed-text">100%</span>
+        </div>
+      </div>
+
+      <div class="hud-stat-card coin-card">
+        <span class="hud-label">COINS</span>
+        <div class="coin-val-row">
+          <span class="coin-icon-spin">🪙</span>
+          <span id="hud-coins" class="hud-value">0</span>
+        </div>
+      </div>
+
+      <button id="btn-pause" class="btn-pause-round" aria-label="Pause Game">
+        <span>❚❚</span>
+      </button>
+    </div>
+
+    <!-- Active Power-Up Timers Bar -->
+    <div id="hud-powerups" class="powerups-container">
+      <!-- Populated dynamically via PowerUpManager -->
+    </div>
+
+    <!-- Zone Transition Big Banner -->
+    <div id="zone-banner" class="zone-banner">
+      <div class="banner-inner">
+        <span class="banner-pre">NOW ENTERING</span>
+        <h2 id="zone-banner-title">RED FORT</h2>
+        <p id="zone-banner-desc">Lal Qila Fortress of Delhi</p>
+      </div>
+    </div>
+
+    <!-- Mobile Touch Controls (Toggleable) -->
+    <div id="mobile-controls" class="mobile-controls-overlay">
+      <div class="mobile-btn-group left-group">
+        <button id="touch-left" class="touch-btn">◀</button>
+        <button id="touch-right" class="touch-btn">▶</button>
+      </div>
+      <div class="mobile-btn-group right-group">
+        <button id="touch-jump" class="touch-btn action-jump">▲ JUMP</button>
+        <button id="touch-slide" class="touch-btn action-slide">▼ SLIDE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause Screen -->
+  <div id="pause-screen" class="ui-screen modal-screen">
+    <div class="modal-card">
+      <h2 class="modal-title">GAME PAUSED</h2>
+      <p class="modal-subtitle">Catch your breath with some Kadak Chai ☕</p>
+
+      <div class="modal-stats">
+        <div class="modal-stat-box">
+          <span>CURRENT SCORE</span>
+          <strong id="pause-score">0</strong>
+        </div>
+        <div class="modal-stat-box">
+          <span>DISTANCE</span>
+          <strong id="pause-distance">0 m</strong>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="btn-resume" class="btn btn-primary btn-large glow-effect">
+          <span class="btn-icon">▶</span> RESUME
+        </button>
+        <button id="btn-pause-restart" class="btn btn-secondary">
+          <span class="btn-icon">🔄</span> RESTART RUN
+        </button>
+        <button id="btn-pause-menu" class="btn btn-secondary">
+          <span class="btn-icon">🏠</span> MAIN MENU
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="game-over-screen" class="ui-screen modal-screen">
+    <div class="modal-card game-over-card">
+      <div id="new-high-score-badge" class="badge-new-record">🏆 NEW HIGH SCORE!</div>
+      <h2 class="modal-title game-over-title">RUN COMPLETED!</h2>
+      <p class="modal-subtitle">Great sprint through the incredible corridors of India!</p>
+
+      <div class="game-over-stats-grid">
+        <div class="go-stat-item highlight">
+          <span class="go-label">FINAL SCORE</span>
+          <span id="go-score" class="go-value">0</span>
+        </div>
+        <div class="go-stat-item">
+          <span class="go-label">BEST SCORE</span>
+          <span id="go-best" class="go-value">0</span>
+        </div>
+        <div class="go-stat-item">
+          <span class="go-label">DISTANCE</span>
+          <span id="go-distance" class="go-value">0 m</span>
+        </div>
+        <div class="go-stat-item">
+          <span class="go-label">COINS COLLECTED</span>
+          <span id="go-coins" class="go-value">🪙 0</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="btn-restart" class="btn btn-primary btn-large glow-effect">
+          <span class="btn-icon">⚡</span> RUN AGAIN
+        </button>
+        <button id="btn-gameover-menu" class="btn btn-secondary">
+          <span class="btn-icon">🏠</span> MAIN MENU
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Character / Outfits Modal -->
+  <div id="character-modal" class="ui-screen modal-screen">
+    <div class="modal-card outfits-modal-card">
+      <div class="modal-header-row">
+        <h2 class="modal-title">WARDROBE & OUTFITS</h2>
+        <button id="btn-close-outfits" class="btn-close">✕</button>
+      </div>
+      <p class="modal-subtitle">Choose your signature look for the run</p>
+
+      <div class="outfits-grid" id="outfits-container">
+        <!-- Injected dynamically via CharacterSelection.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- How To Play Modal -->
+  <div id="instructions-modal" class="ui-screen modal-screen">
+    <div class="modal-card instructions-card">
+      <div class="modal-header-row">
+        <h2 class="modal-title">HOW TO RUN</h2>
+        <button id="btn-close-instructions" class="btn-close">✕</button>
+      </div>
+      
+      <div class="instructions-content">
+        <div class="instruction-section">
+          <h3>🎮 DESKTOP CONTROLS</h3>
+          <div class="keys-grid">
+            <div class="key-item"><span class="key">A</span> / <span class="key">◀</span> : Change Lane Left</div>
+            <div class="key-item"><span class="key">D</span> / <span class="key">▶</span> : Change Lane Right</div>
+            <div class="key-item"><span class="key">W</span> / <span class="key">▲</span> / <span class="key">Space</span> : Jump Over Obstacles</div>
+            <div class="key-item"><span class="key">S</span> / <span class="key">▼</span> : Slide Under Banners</div>
+            <div class="key-item"><span class="key">Esc</span> / <span class="key">P</span> : Pause</div>
+          </div>
+        </div>
+
+        <div class="instruction-section">
+          <h3>📱 MOBILE CONTROLS</h3>
+          <div class="mobile-gestures">
+            <p><strong>Swipe Left / Right:</strong> Switch lanes smoothly</p>
+            <p><strong>Swipe Up:</strong> High jump over low barricades & cockroaches</p>
+            <p><strong>Swipe Down:</strong> Slide under high banners and hanging toran</p>
+          </div>
+        </div>
+
+        <div class="instruction-section">
+          <h3>⚡ POWER-UPS</h3>
+          <div class="powerup-legend-grid">
+            <div class="powerup-item">
+              <span class="pu-icon">☕</span>
+              <div>
+                <strong>Kadak Chai Rush:</strong> Supersonic speed & invincible sprint!
+              </div>
+            </div>
+            <div class="powerup-item">
+              <span class="pu-icon">🧲</span>
+              <div>
+                <strong>Chumbak (Coin Magnet):</strong> Draws all golden rupee coins from all 3 lanes!
+              </div>
+            </div>
+            <div class="powerup-item">
+              <span class="pu-icon">🛡️</span>
+              <div>
+                <strong>Surakshak Shield:</strong> Absorbs 1 crash without stopping!
+              </div>
+            </div>
+            <div class="powerup-item">
+              <span class="pu-icon">🚀</span>
+              <div>
+                <strong>Turbo Boost:</strong> Supercharged speed with double score multiplier!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="ui-screen modal-screen">
+    <div class="modal-card settings-card">
+      <div class="modal-header-row">
+        <h2 class="modal-title">SETTINGS</h2>
+        <button id="btn-close-settings" class="btn-close">✕</button>
+      </div>
+
+      <div class="settings-list">
+        <div class="setting-item">
+          <div>
+            <strong>Sound Effects & Music</strong>
+            <p class="setting-desc">Indian festive percussion and action audio</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-sound" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <strong>High Graphics / Shadows</strong>
+            <p class="setting-desc">Dynamic soft shadows and particle effects</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-shadows" checked>
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <strong>On-Screen Touch Buttons</strong>
+            <p class="setting-desc">Show virtual D-pad and buttons on mobile</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="setting-touch-buttons">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
+
